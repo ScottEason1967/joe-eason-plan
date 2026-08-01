@@ -276,11 +276,11 @@
 
 <!-- ================= PLANNER ================= -->
 <section class="view" id="myday">
-  <p class="lead">His week moves around, so build the one he's <b>actually</b> got. Tap the sessions onto each day and hit build. It works out the fuel and recovery for every day and balances the whole week: carbs go up the night before a game wherever it falls, the ice bath rule follows the S&amp;C to whatever day it's on, and it warns you if the week stacks too many hard days together.</p>
+  <p class="lead">His week moves around, so build the one he's <b>actually</b> got. Put in only the sessions the clubs and coaches set. Everything else, his <b>bike work, fuel and recovery</b>, is worked out from those, because those aren't things he picks, they follow the week. Carbs go up the night before a game wherever it falls, the ice bath rule follows the S&amp;C to whatever day it's on, the bike engine drops onto the light days and off the hard ones, and it warns you if the week stacks too many hard days together.</p>
 
   <div class="card">
-    <h3>Set his week</h3>
-    <p class="muted" style="margin:4px 0 10px">Tap a session to add or remove it. Leave a day empty for a rest day. More than one on a day is fine (a double, or a match plus a session). It opens on his usual shape &mdash; change whatever's different this week.</p>
+    <h3>Set his sessions</h3>
+    <p class="muted" style="margin:4px 0 10px">Tap to add or remove. Only the fixed sessions go here: Ashington, technical one-to-ones, futsal, S&amp;C, matches. Leave a day empty for no fixed session. More than one on a day is fine (a double, or a match plus a session). It opens on his usual shape &mdash; change whatever's different this week.</p>
     <div id="weekGrid"></div>
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn" id="buildBtn">Build the week &rarr;</button>
@@ -574,15 +574,13 @@ render('m-dessert',MEALS.dessert);
 /* ---- Weekly planner ---- */
 var PDAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var SESS=[
-  {id:'bike',label:'Bike engine',load:1},
-  {id:'spin',label:'Easy spin',load:0},
   {id:'team',label:'Ashington',load:2,cut:true},
   {id:'tech',label:'Technical',load:2,cut:true},
   {id:'futsal',label:'Futsal',load:2,cut:true},
   {id:'sc',label:'S&amp;C',load:2,sc:true},
   {id:'match',label:'Match',load:3,cut:true,match:true}
 ];
-var PDEFAULT={Mon:['bike'],Tue:['team'],Wed:['tech'],Thu:['sc','team'],Fri:[],Sat:['match'],Sun:[]};
+var PDEFAULT={Mon:['tech'],Tue:['team'],Wed:['tech'],Thu:['sc','team'],Fri:[],Sat:['match'],Sun:[]};
 var WEEK={};
 PDAYS.forEach(function(d){WEEK[d]=(PDEFAULT[d]||[]).slice()});
 (function(){
@@ -615,54 +613,85 @@ PDAYS.forEach(function(d){WEEK[d]=(PDEFAULT[d]||[]).slice()});
 })();
 
 function dayMeta(ids){
-  var sel=SESS.filter(function(s){return ids.indexOf(s.id)>-1});
-  var real=sel.filter(function(s){return s.load>0});
+  var real=SESS.filter(function(s){return ids.indexOf(s.id)>-1});
   var totalLoad=real.reduce(function(a,s){return a+s.load},0);
-  var hardCount=real.filter(function(s){return s.load>=2}).length;
+  var tech=real.some(function(s){return s.id==='tech'});
+  var hasHard=real.some(function(s){return s.id!=='tech'});
   return {
-    sel:sel, real:real, totalLoad:totalLoad, hardCount:hardCount,
+    real:real, totalLoad:totalLoad, tech:tech, hasHard:hasHard,
+    techOnly:tech && !hasHard,
+    empty:real.length===0,
     cut:real.some(function(s){return s.cut}),
-    sc:real.some(function(s){return s.sc}),
-    match:real.some(function(s){return s.match}),
-    isDouble:hardCount>=2 || (real.some(function(s){return s.sc}) && real.length>=2),
-    big:(real.some(function(s){return s.match})) || totalLoad>=4
+    sc:real.some(function(s){return s.id==='sc'}),
+    match:real.some(function(s){return s.id==='match'}),
+    isDouble:real.length>=2,
+    big:real.some(function(s){return s.id==='match'}) || totalLoad>=4,
+    isHard:real.some(function(s){return s.id!=='tech'}) || real.length>=2
   };
 }
 
 function buildWeek(){
   var out=document.getElementById('weekOut');
   var metas=PDAYS.map(function(d){return dayMeta(WEEK[d])});
-  var hardDays=metas.filter(function(m){return m.totalLoad>=2}).length;
-  var restDays=metas.filter(function(m){return m.totalLoad===0}).length;
+  var hardDays=metas.filter(function(m){return m.isHard}).length;
+  var restDays=metas.filter(function(m){return m.empty}).length;
 
+  // ---- bike/treadmill is prescribed from the week, not chosen ----
+  var hardFootballDays=metas.filter(function(m){return m.hasHard}).length;
+  var engineAllowed=hardFootballDays<=4;
+  var cond=PDAYS.map(function(){return null;});
+  var engineCount=0;
+  if(engineAllowed){
+    for(var a=0;a<7;a++){ if(metas[a].techOnly && engineCount<2){ cond[a]={k:'engine'}; engineCount++; } }
+  }
+  var restIdx=[]; for(var b=0;b<7;b++){ if(metas[b].empty) restIdx.push(b); }
+  var maxLoad=-1, maxIdx=-1;
+  for(var c2=0;c2<7;c2++){ if(metas[c2].totalLoad>maxLoad){maxLoad=metas[c2].totalLoad;maxIdx=c2;} }
+  var protectedRest=-1;
+  if(maxIdx>=0 && metas[maxIdx+1] && metas[maxIdx+1].empty) protectedRest=maxIdx+1;
+  if(protectedRest<0 && restIdx.length) protectedRest=restIdx[restIdx.length-1];
+  restIdx.forEach(function(idx){ cond[idx]=(idx===protectedRest)?{k:'off'}:{k:'flush'}; });
+  if(engineAllowed && engineCount===0){
+    for(var r=0;r<restIdx.length;r++){ if(restIdx[r]!==protectedRest){ cond[restIdx[r]]={k:'engine'}; engineCount++; break; } }
+  }
+
+  // ---- warnings ----
   var warns=[];
   var run=0, runMax=0, runStart=-1, worstStart=-1;
   for(var i=0;i<7;i++){
-    if(metas[i].totalLoad>=2){ if(run===0)runStart=i; run++; if(run>runMax){runMax=run;worstStart=runStart;} }
+    if(metas[i].isHard){ if(run===0)runStart=i; run++; if(run>runMax){runMax=run;worstStart=runStart;} }
     else run=0;
   }
   if(runMax>=3){ warns.push(runMax+' hard days in a row ('+PDAYS[worstStart]+'&ndash;'+PDAYS[worstStart+runMax-1]+'). Try to drop one to a lighter day or a rest.'); }
   if(restDays===0) warns.push('No proper recovery day this week. Aim for at least one genuinely easy day, ideally two.');
   else if(restDays===1) warns.push('Only one real recovery day. Two is better when the load allows.');
+  if(!engineAllowed) warns.push('Heavy week, so no extra bike engine work has been added. The football is plenty.');
 
+  // ---- per-day flags ----
   var flags=PDAYS.map(function(){return {};});
   for(var j=0;j<7;j++){
     var nx=metas[j+1];
     if(nx && (nx.match||nx.big) && !metas[j].big && metas[j].totalLoad<4){ flags[j].carbUp=true; }
     var pv=metas[j-1];
-    if(pv && pv.big && metas[j].totalLoad>=2){ flags[j].afterBig=true; }
+    if(pv && pv.big && metas[j].isHard){ flags[j].afterBig=true; }
   }
 
   function li(a){return a.map(function(x){return '<li>'+x+'</li>'}).join('')}
-  function fuelNote(m,f){
-    if(m.totalLoad===0) return 'Normal meals, carbs a touch lower, a real protein source at each. One dessert in the evening.';
+  function fuelNote(m,f,c){
+    if(m.empty && !(c && c.k==='engine')) return 'Normal meals, carbs a touch lower, a real protein source at each. One dessert in the evening.';
     var t='Protein at every meal, carbs matched to the day. Fuel ~90 min before the session, refuel with carbs + protein after.';
     if(m.isDouble) t+=' Two sessions, so refuel between them as well.';
     if(f.carbUp) t+=' <b>Keep carbs up tonight for tomorrow</b> (his fish fingers and chips night before a game).';
     return t;
   }
+  function bikeText(c){
+    if(!c) return 'None. The football is the load today.';
+    if(c.k==='engine') return 'Zone 2 engine, 35&ndash;40 min (RPE 4&ndash;5). Steady, builds the aerobic base. Skip it if Whoop is red.';
+    if(c.k==='flush') return 'Easy Zone 1 spin, 15&ndash;20 min, just to move the legs.';
+    return 'Nothing, a full day off the bike.';
+  }
   function recList(m){
-    if(m.totalLoad===0) return ['Normatec legs 20 min flush + hip/abdomen wrap on the groin','Daily mobility + Copenhagen adduction','Foam roll, unhurried'];
+    if(m.empty) return ['Normatec legs 20 min flush + hip/abdomen wrap on the groin','Daily mobility + Copenhagen adduction','Foam roll, unhurried'];
     var r=['Normatec legs 20&ndash;30 min + massage gun on the legs'];
     if(m.cut) r.push('Normatec hips 15 min + hip/abdomen wrap on the groin');
     if(m.sc||m.match||m.big) r.push('Knee units 15 min each side');
@@ -671,37 +700,36 @@ function buildWeek(){
   }
   function iceBath(m){
     if(m.sc) return {t:'No, it would cancel the S&amp;C',c:'p-hard'};
-    if(m.match||m.hardCount>=2) return {t:'Yes, 10&ndash;12 min within ~2 h',c:'p-quick'};
-    if(m.totalLoad>=2) return {t:'Only if genuinely sore',c:'p-rest'};
+    if(m.match||m.isDouble) return {t:'Yes, 10&ndash;12 min within ~2 h',c:'p-quick'};
+    if(m.hasHard) return {t:'Only if genuinely sore',c:'p-rest'};
     return {t:'Not needed',c:'p-rest'};
   }
-  function typeOf(m){
-    if(m.totalLoad===0) return {t:'Recovery',c:'p-rest'};
+  function typeOf(m,c){
+    if(m.empty) return (c&&c.k==='engine')?{t:'Light',c:'p-med'}:{t:'Recovery',c:'p-rest'};
     if(m.big) return {t:'Big day',c:'p-hard'};
-    if(m.totalLoad>=2) return {t:'Training',c:'p-med'};
-    return {t:'Light',c:'p-med'};
+    return {t:'Training',c:'p-med'};
   }
-  function carbOf(m,f){
-    if(m.totalLoad===0) return 'Lower carb';
+  function carbOf(m,f,c){
+    if(m.empty) return (c&&c.k==='engine')?'Steady carb':(f.carbUp?'Carbs up for tomorrow':'Lower carb');
     if(m.big) return 'High carb';
     if(f.carbUp) return 'Carbs up for tomorrow';
-    if(m.totalLoad>=2) return 'Medium carb';
-    return 'Steady carb';
+    return 'Medium carb';
   }
 
   var html='';
   var sumCls = warns.length? 'c-warn':'c-good';
-  html+='<div class="callout '+sumCls+'"><b>The week you\'ve built.</b> '+hardDays+' hard day'+(hardDays===1?'':'s')+', '+restDays+' recovery day'+(restDays===1?'':'s')+'.';
+  html+='<div class="callout '+sumCls+'"><b>The week you\'ve built.</b> '+hardDays+' hard day'+(hardDays===1?'':'s')+', '+restDays+' recovery day'+(restDays===1?'':'s')+', '+engineCount+' bike engine session'+(engineCount===1?'':'s')+'.';
   if(warns.length){ html+='<ul class="clean" style="margin:6px 0 0">'+li(warns)+'</ul>'; } else { html+=' Nicely balanced.'; }
   html+='</div>';
 
   for(var k=0;k<7;k++){
-    var m=metas[k], f=flags[k], ty=typeOf(m), ib=iceBath(m);
-    var names=m.real.length? m.real.map(function(s){return s.label}).join(', ') : 'Rest day';
+    var m=metas[k], f=flags[k], cc=cond[k], ty=typeOf(m,cc), ib=iceBath(m);
+    var names=m.real.length? m.real.map(function(s){return s.label}).join(', ') : (cc&&cc.k==='engine'?'Bike engine':cc&&cc.k==='flush'?'Easy spin':'Rest day');
     html+='<div class="card"><div class="dhead"><span class="dday">'+PDAYS[k]+'</span><span class="dtag">'+names+'</span></div>';
-    html+='<span class="out-tag '+ty.c+'">'+ty.t+'</span> <span class="pill p-carb" style="vertical-align:middle">'+carbOf(m,f)+'</span>';
+    html+='<span class="out-tag '+ty.c+'">'+ty.t+'</span> <span class="pill p-carb" style="vertical-align:middle">'+carbOf(m,f,cc)+'</span>';
     if(f.afterBig) html+=' <span class="pill p-rest" style="vertical-align:middle">Recovery emphasis after yesterday</span>';
-    html+='<p class="muted" style="margin:8px 0 6px"><b>Fuel.</b> '+fuelNote(m,f)+'</p>';
+    html+='<p class="muted" style="margin:8px 0 4px"><b>Bike / treadmill.</b> '+bikeText(cc)+'</p>';
+    html+='<p class="muted" style="margin:0 0 6px"><b>Fuel.</b> '+fuelNote(m,f,cc)+'</p>';
     html+='<p class="muted" style="margin:0 0 4px"><b>Recovery.</b></p><ul class="clean muted" style="margin:0">'+li(recList(m))+'</ul>';
     html+='<p style="margin:8px 0 0"><span class="pill '+ib.c+'">Ice bath</span> <span class="muted">'+ib.t+'</span></p>';
     html+='</div>';
