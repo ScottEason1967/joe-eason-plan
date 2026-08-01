@@ -186,6 +186,24 @@
 <section class="view active" id="week">
   <div id="weekBanner"></div>
   <p class="lead">His week, day by day. <b>Tap any meal to see the options</b> for that feed. <span style="color:#ff5c94;font-weight:700">Coral</span> is a hard day, <span style="color:#c9bcd0;font-weight:700">grey</span> is recovery. This shows his <b>standard week</b> by default. To change it for a week that's different, use the <b>Planner</b> tab and it updates here.</p>
+
+  <div class="card" id="readyCard">
+    <h3>How's Joe today?</h3>
+    <p class="muted" style="margin:2px 0 8px">Tap how he's pulling up, add his Whoop recovery if he's got it, and today's plan nudges to match. Saves on this device.</p>
+    <div class="segs" id="feelSegs">
+      <button class="seg" data-feel="fresh" type="button">Fresh</button>
+      <button class="seg" data-feel="good" type="button">Good</button>
+      <button class="seg" data-feel="tired" type="button">Tired</button>
+      <button class="seg" data-feel="wrecked" type="button">Wrecked</button>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <label class="muted" style="font-size:13px">Whoop recovery
+        <input id="whoopIn" type="number" min="0" max="100" placeholder="%" style="width:76px;margin-left:8px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 9px;font-size:14px">
+      </label>
+      <button class="btn ghost" id="readyClr" type="button">Clear today</button>
+    </div>
+  </div>
+
   <div id="weekOut"></div>
 </section>
 
@@ -234,12 +252,12 @@
 
   <h2 class="vh">The set-in-stone meals</h2>
   <div class="card">
-    <div class="mhead"><h3 style="margin:0">Friday fish fingers &amp; chips</h3></div>
-    <p class="muted" style="margin:8px 0 0">Every Friday, the night before a game. You asked if it's damaging him. It isn't. The night before a match you actually want carbs in the tank, and that's exactly what chips are, so the timing is good, not bad. Two small tweaks and it's a smart pre-match meal rather than a guilty one: oven-bake rather than deep-fry, and put beans or a bit of veg on the side. Fish fingers add a little protein too. Keep the ritual, just cook it that way.</p>
+    <div class="mhead"><h3 style="margin:0">Friday night at grandma's &mdash; fish and chips</h3></div>
+    <p class="muted" style="margin:8px 0 0">Every Friday at his grandma's: fish and chips, then rice pudding and Maltesers. It's the night before a game, and that's genuinely good timing, the night before you want carbs in the tank and that's exactly what it gives him. Leave it as it is. It's a fixed part of his week and it does no harm at all.</p>
   </div>
   <div class="card">
-    <div class="mhead"><h3 style="margin:0">Saturday night takeaway &mdash; keep it</h3></div>
-    <p class="muted" style="margin:8px 0 0">His usual: clean double Quarter Pounder (two patties, bun, no sauce or cheese), water, grilled chicken, half a 12" margherita, plain McFlurry, Maltesers to follow. It looks big, but after a match it's a genuinely smart refuel: a lot of protein, plenty of carbs to top the tank back up, and crucially <b>no calories drunk</b> because he sticks to water. Leave it exactly as it is. It's the reward and it does a job.</p>
+    <div class="mhead"><h3 style="margin:0">Saturday night takeaway &mdash; every Saturday</h3></div>
+    <p class="muted" style="margin:8px 0 0">His usual, every Saturday night regardless of what he's done that day: clean double Quarter Pounder (two patties, bun, no sauce or cheese), water, grilled chicken, half a 12" margherita, plain McFlurry, Maltesers to follow. It looks big, but it's a genuinely smart feed: a lot of protein, plenty of carbs, and crucially <b>no calories drunk</b> because he sticks to water. Leave it exactly as it is. It's the reward and it does a job. (Note: a midweek match doesn't get this, it's a Saturday thing.)</p>
   </div>
 </section>
 
@@ -492,6 +510,15 @@ render('m-dessert',MEALS.dessert);
 
 /* ---- Weekly planner ---- */
 var MODE='standard';
+var READY={feel:null,whoop:null};
+var TODAY=(function(){var d=new Date().getDay();return d===0?6:d-1;})();
+function worstR(a,b){var o={green:0,amber:1,red:2};return o[a]>=o[b]?a:b;}
+function readyState(){
+  var s=null;
+  if(READY.whoop!=null && READY.whoop!==''){ var wn=+READY.whoop; if(!isNaN(wn)) s = wn>=67?'green':(wn>=34?'amber':'red'); }
+  if(READY.feel){ var fs=(READY.feel==='fresh'||READY.feel==='good')?'green':(READY.feel==='tired'?'amber':'red'); s = s?worstR(s,fs):fs; }
+  return s;
+}
 var PDAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var SESS=[
   {id:'team',label:'Ashington',load:2,cut:true},
@@ -582,15 +609,14 @@ function buildWeek(){
   if(engineAllowed){
     for(var a=0;a<7;a++){ if(metas[a].techOnly && engineCount<2){ cond[a]={k:'engine'}; engineCount++; } }
   }
-  var restIdx=[]; for(var b=0;b<7;b++){ if(metas[b].empty) restIdx.push(b); }
-  var maxLoad=-1, maxIdx=-1;
-  for(var c2=0;c2<7;c2++){ if(metas[c2].totalLoad>maxLoad){maxLoad=metas[c2].totalLoad;maxIdx=c2;} }
-  var protectedRest=-1;
-  if(maxIdx>=0 && metas[maxIdx+1] && metas[maxIdx+1].empty) protectedRest=maxIdx+1;
-  if(protectedRest<0 && restIdx.length) protectedRest=restIdx[restIdx.length-1];
-  restIdx.forEach(function(idx){ cond[idx]=(idx===protectedRest)?{k:'off'}:{k:'flush'}; });
-  if(engineAllowed && engineCount===0){
-    for(var r=0;r<restIdx.length;r++){ if(restIdx[r]!==protectedRest){ cond[restIdx[r]]={k:'engine'}; engineCount++; break; } }
+  // rest days: prescribe by how long since the last hard day (fatigue-aware)
+  function lastHardBefore(idx){ for(var q=idx-1;q>=0;q--){ if(metas[q].isHard) return idx-q; } return 99; }
+  for(var b=0;b<7;b++){
+    if(!metas[b].empty || cond[b]) continue;
+    var gap=lastHardBefore(b);
+    if(gap===1) cond[b]={k:'recover'};
+    else if(gap===2) cond[b]={k:'flush'};
+    else cond[b]={k:'off'};
   }
 
   // ---- warnings ----
@@ -616,20 +642,29 @@ function buildWeek(){
 
   function li(a){return a.map(function(x){return '<li>'+x+'</li>'}).join('')}
   function fuelNote(m,f,c){
-    if(m.empty && !(c && c.k==='engine')) return 'Normal meals, carbs a touch lower, a real protein source at each. One dessert in the evening.';
+    if(m.empty){
+      if(c&&c.k==='recover'){ var rt='Legs will be feeling yesterday, so today is refuel and repair. Keep protein high and get decent carbs in to top the tank back up.'; if(f.carbUp) rt+=' Tomorrow\'s a big one too, so carbs stay up tonight.'; return rt; }
+      if(c&&c.k==='engine') return 'Easy day. Protein high, carbs steady around the spin.';
+      if(f.carbUp) return 'Protein high, and keep carbs up tonight to fuel tomorrow.';
+      return 'Normal meals, carbs a touch lower, a real protein source at each. One dessert in the evening.';
+    }
     var t='Protein at every meal, carbs matched to the day. Fuel ~90 min before the session, refuel with carbs + protein after.';
     if(m.isDouble) t+=' Two sessions, so refuel between them as well.';
-    if(f.carbUp) t+=' <b>Keep carbs up tonight for tomorrow</b> (his fish fingers and chips night before a game).';
+    if(f.carbUp) t+=' <b>Keep carbs up tonight for tomorrow.</b>';
     return t;
   }
   function bikeText(c){
     if(!c) return 'None. The football is the load today.';
     if(c.k==='engine') return 'Zone 2 engine, 35&ndash;40 min (RPE 4&ndash;5). Steady, builds the aerobic base. Skip it if Whoop is red.';
-    if(c.k==='flush') return 'Easy Zone 1 spin, 15&ndash;20 min, just to move the legs.';
+    if(c.k==='flush') return 'Easy Zone 1 spin, 15&ndash;20 min, low resistance, just to move the legs and clear the stiffness.';
+    if(c.k==='recover') return 'No bike today, his legs need it. Recovery only: mobility, Normatec, a good refuel.';
     return 'Nothing, a full day off the bike.';
   }
-  function recList(m){
-    if(m.empty) return ['Normatec legs 20 min flush + hip/abdomen wrap on the groin','Daily mobility + Copenhagen adduction','Foam roll, unhurried'];
+  function recList(m,c){
+    if(m.empty){
+      if(c&&c.k==='recover') return ['Normatec legs 25&ndash;30 min + hips + hip/abdomen wrap on the groin','Massage gun through the legs','Daily mobility + Copenhagen adduction','Longer foam roll, and an early night'];
+      return ['Normatec legs 20 min + hip/abdomen wrap on the groin','Daily mobility + Copenhagen adduction','Foam roll, unhurried'];
+    }
     var r=['Normatec legs 20&ndash;30 min + massage gun on the legs'];
     if(m.cut) r.push('Normatec hips 15 min + hip/abdomen wrap on the groin');
     if(m.sc||m.match||m.big) r.push('Knee units 15 min each side');
@@ -648,7 +683,12 @@ function buildWeek(){
     return {t:'Training',c:'p-med'};
   }
   function carbOf(m,f,c){
-    if(m.empty) return (c&&c.k==='engine')?'Steady carb':(f.carbUp?'Carbs up for tomorrow':'Lower carb');
+    if(m.empty){
+      if(f.carbUp) return 'Carbs up for tomorrow';
+      if(c&&c.k==='recover') return 'Refuel carbs';
+      if(c&&c.k==='engine') return 'Steady carb';
+      return 'Lower carb';
+    }
     if(m.big) return 'High carb';
     if(f.carbUp) return 'Carbs up for tomorrow';
     return 'Medium carb';
@@ -664,8 +704,8 @@ function buildWeek(){
       if(m.isDouble) fe.push({label:'Between sessions', note:'Carbs + protein between the two: a shake + banana, or a rice/pasta pot.'});
     }
     var dn='';
-    if(day==='Fri') dn='His Friday fish fingers &amp; chips fits here, fine before a game. Oven-bake, add beans or veg.';
-    if(m.match) dn='After a match, the clean McDonald\'s takeaway is a solid refuel (see the Meals tab).';
+    if(day==='Fri') dn='<b>Friday ritual (fixed):</b> fish and chips at his grandma\'s, with rice pudding and Maltesers after. Fine, it\'s carbs before a game.';
+    if(day==='Sat') dn='<b>Saturday night (fixed):</b> the takeaway &mdash; clean double Quarter Pounder, water, grilled chicken, half a margherita, plain McFlurry, Maltesers. A big feed and a good refuel.';
     fe.push({label:(m.empty?'Dinner':'Dinner &amp; refuel'), cat:'dinner', note:dn});
     fe.push({label:'Dessert', cat:'dessert', note:'Something sweet after, he needs it. Maltesers, or a protein or rice pudding.'});
     return fe;
@@ -687,23 +727,52 @@ function buildWeek(){
   if(warns.length){ html+='<ul class="clean" style="margin:6px 0 0">'+li(warns)+'</ul>'; } else { html+=' Nicely balanced.'; }
   html+='</div>';
 
+  var todayReady = readyState();
   for(var k=0;k<7;k++){
     var m=metas[k], f=flags[k], cc=cond[k], ty=typeOf(m,cc), ib=iceBath(m);
-    var names=m.real.length? m.real.map(function(s){return s.label}).join(', ') : (cc&&cc.k==='engine'?'Bike engine':cc&&cc.k==='flush'?'Easy spin':'Rest day');
-    html+='<div class="card"><div class="dhead"><span class="dday">'+PDAYS[k]+'</span><span class="dtag">'+names+'</span></div>';
+    var isToday=(k===TODAY);
+    var rd = isToday? todayReady : null;
+    var names=m.real.length? m.real.map(function(s){return s.label}).join(', ') : (cc&&cc.k==='engine'?'Bike engine':cc&&cc.k==='flush'?'Easy spin':cc&&cc.k==='recover'?'Recovery + refuel':'Rest day');
+    html+='<div class="card"'+(isToday?' style="border-color:var(--accent)"':'')+'><div class="dhead"><span class="dday">'+PDAYS[k]+(isToday?' &middot; today':'')+'</span><span class="dtag">'+names+'</span></div>';
+    if(rd){
+      var rmsg = rd==='green'?'Good recovery, follow the plan.':rd==='amber'?'A bit under-recovered. Keep the plan but drop the optional bike top-up, and get extra food and sleep.':'Not recovered. Make today easy: ease or swap any session he can, and protect sleep and food.';
+      html+='<div class="callout '+(rd==='green'?'c-good':'c-warn')+'" style="margin:4px 0 10px"><b>Today &middot; '+rd.toUpperCase()+'.</b> '+rmsg+'</div>';
+    }
     html+='<span class="out-tag '+ty.c+'">'+ty.t+'</span> <span class="pill p-carb" style="vertical-align:middle">'+carbOf(m,f,cc)+'</span>';
     if(f.afterBig) html+=' <span class="pill p-rest" style="vertical-align:middle">Recovery emphasis after yesterday</span>';
-    html+='<p class="muted" style="margin:8px 0 4px"><b>Bike / treadmill.</b> '+bikeText(cc)+'</p>';
+    var bikeLine=bikeText(cc);
+    if(rd && (rd==='amber'||rd==='red') && cc && (cc.k==='engine'||cc.k==='flush')) bikeLine='Skip the bike top-up today, he\'s not fully recovered. Just move and stretch.';
+    html+='<p class="muted" style="margin:8px 0 4px"><b>Bike / treadmill.</b> '+bikeLine+'</p>';
     html+='<p class="muted" style="margin:0 0 6px"><b>Fuel.</b> '+fuelNote(m,f,cc)+'</p>';
     html+= feedHtml(feedsFor(PDAYS[k],m));
-    html+='<p class="muted" style="margin:10px 0 4px"><b>Recovery.</b></p><ul class="clean muted" style="margin:0">'+li(recList(m))+'</ul>';
+    html+='<p class="muted" style="margin:10px 0 4px"><b>Recovery.</b></p><ul class="clean muted" style="margin:0">'+li(recList(m,cc))+'</ul>';
     html+='<p style="margin:8px 0 0"><span class="pill '+ib.c+'">Ice bath</span> <span class="muted">'+ib.t+'</span></p>';
+    if(rd==='red' && m.hasHard) html+='<p class="muted" style="margin:8px 0 0"><span class="pill p-hard">Heads up</span> Whoop\'s red and there\'s a session today. If it\'s his to control, ease it or make it technical; if it\'s team training, warm up extra, hydrate and don\'t push into the red.</p>';
     html+='</div>';
   }
   html+='<div class="callout c-info"><b>Every day, whatever the week looks like:</b> a real protein source at each meal, water through the day, 9&ndash;10 hours\' sleep, and a full warm-up before every session. If Whoop is red in the morning, ease that day and protect sleep.</div>';
   out.innerHTML=html;
   out.querySelectorAll('.feed').forEach(function(fe){ fe.querySelector('.fhead').addEventListener('click',function(){ fe.classList.toggle('open'); }); });
 }
+
+/* ---- daily readiness check (manual, saves per-device) ---- */
+function readyKey(){ var d=new Date(); return 'joe_ready_'+d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+(function(){
+  try{ var s=localStorage.getItem(readyKey()); if(s) READY=JSON.parse(s); }catch(e){}
+  var fs=document.getElementById('feelSegs'); if(!fs) return;
+  function save(){ try{ localStorage.setItem(readyKey(), JSON.stringify(READY)); }catch(e){} }
+  function paint(){
+    fs.querySelectorAll('.seg').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-feel')===READY.feel); });
+    var wi=document.getElementById('whoopIn'); if(wi) wi.value=(READY.whoop!=null?READY.whoop:'');
+  }
+  fs.querySelectorAll('.seg').forEach(function(b){
+    b.addEventListener('click',function(){ READY.feel=b.getAttribute('data-feel'); save(); paint(); buildWeek(); });
+  });
+  var wi=document.getElementById('whoopIn');
+  if(wi) wi.addEventListener('input',function(){ READY.whoop = wi.value===''?null:+wi.value; save(); buildWeek(); });
+  document.getElementById('readyClr').addEventListener('click',function(){ READY={feel:null,whoop:null}; save(); paint(); buildWeek(); });
+  paint(); buildWeek();
+})();
 </script>
 </body>
 </html>
