@@ -218,7 +218,7 @@
     </div>
     <p class="muted" id="stdMsg" style="margin:12px 0 0">Following his standard week. The This Week tab is set to it. Tap <b>Customise</b> to change what he's doing this week.</p>
     <div id="customPanel" style="display:none;margin-top:12px">
-      <p class="muted" style="margin:0 0 10px">Tap to add or remove sessions. Only the fixed sessions go here: Ashington, technical one-to-ones, futsal, S&amp;C, matches. Leave a day empty for rest. More than one on a day is fine.</p>
+      <p class="muted" style="margin:0 0 10px">Tap to add or remove sessions. Only the fixed sessions go here: club training, technical one-to-ones, futsal, S&amp;C, matches. Leave a day empty for rest. More than one on a day is fine.</p>
       <div id="weekGrid"></div>
       <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn" id="buildBtn">Build the week &rarr;</button>
@@ -272,7 +272,7 @@
   <table class="tg">
     <tr><th>Day</th><th>What he does</th><th>Ice bath?</th></tr>
     <tr><td><b>Mon</b><br><span class="muted" style="font-size:11px">bike + Kayden</span></td><td>Normatec legs 20 min + massage gun on the legs, evening.</td><td class="muted">No</td></tr>
-    <tr><td><b>Tue</b><br><span class="muted" style="font-size:11px">Ashington</span></td><td>Normatec legs 25 min + gun after training.</td><td class="muted">No (only if legs are shot)</td></tr>
+    <tr><td><b>Tue</b><br><span class="muted" style="font-size:11px">Club training</span></td><td>Normatec legs 25 min + gun after training.</td><td class="muted">No (only if legs are shot)</td></tr>
     <tr><td><b>Wed</b><br><span class="muted" style="font-size:11px">Fowler / Brazilian</span></td><td>Lots of cutting: Normatec legs 25 min + hips 15 min, hip/abdomen wrap on the groin, gun.</td><td class="muted">Only if sore</td></tr>
     <tr><td><b>Thu</b><br><span class="muted" style="font-size:11px">S&amp;C + team</span></td><td><b>Biggest night.</b> Hyperboot warm before the S&amp;C. After everything: Normatec legs 30 min + hips 15 + both knees 15, wrap on the groin, gun.</td><td style="color:#ff5c94"><b>NO</b> &mdash; it cancels the S&amp;C</td></tr>
     <tr><td><b>Fri</b><br><span class="muted" style="font-size:11px">recovery</span></td><td>Normatec legs 20 min flush, Hyperboot cool, wrap on the groin.</td><td class="muted">Only if genuinely sore</td></tr>
@@ -521,7 +521,7 @@ function readyState(){
 }
 var PDAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var SESS=[
-  {id:'team',label:'Ashington',load:2,cut:true},
+  {id:'team',label:'Club training',load:2,cut:true},
   {id:'tech',label:'Technical',load:2,cut:true},
   {id:'futsal',label:'Futsal',load:2,cut:true},
   {id:'sc',label:'S&amp;C',load:2,sc:true},
