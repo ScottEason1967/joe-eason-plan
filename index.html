@@ -134,6 +134,15 @@
   .pchip.on.hard{background:var(--accent2);color:#fff;border-color:var(--accent2)}
   .btn.ghost{background:transparent;color:var(--mut);border:1px solid var(--line)}
   .btn.ghost:hover{color:var(--ink);border-color:var(--mut)}
+  .feed{border:1px solid var(--line);border-radius:10px;margin:6px 0;overflow:hidden}
+  .feed .fhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;background:var(--panel2)}
+  .feed .fhead:hover{background:var(--panel)}
+  .feed .ftime{color:var(--accent);font-size:12px;font-weight:700;margin-left:6px}
+  .feed .caret{color:var(--mut);transition:transform .2s;flex:0 0 auto}
+  .feed.open .caret{transform:rotate(90deg);color:var(--accent)}
+  .feed .fbody{display:none;padding:9px 12px;font-size:13.5px;border-top:1px solid var(--line)}
+  .feed.open .fbody{display:block}
+  .feed .fbody b{color:var(--ink)}
   .print{display:none}
   @media print{
     nav.tabs,.foot{display:none}
@@ -162,8 +171,8 @@
 </header>
 
 <nav class="tabs" id="tabs">
-  <button class="tab active" data-v="week">This Week</button>
   <button class="tab" data-v="myday">Planner</button>
+  <button class="tab active" data-v="week">This Week</button>
   <button class="tab" data-v="meals">Meals</button>
   <button class="tab" data-v="recovery">Recovery</button>
   <button class="tab" data-v="mobility">Stretch</button>
@@ -175,120 +184,30 @@
 
 <!-- ================= WEEK ================= -->
 <section class="view active" id="week">
-  <p class="lead">The preseason week, built around what's fixed with Ashington and his one-to-ones. Two colours matter: <span style="color:#ff8f8f;font-weight:700">red</span> is a genuine hard day, <span style="color:#b7c2cf;font-weight:700">grey</span> is real recovery. Protect the grey. Thursday is the spike, so it gets the biggest fuel and the most recovery. When the week changes, and it will, build the real one in the <b>Planner</b> tab and it re-does the fuel and recovery to match.</p>
-
-  <div class="callout c-warn"><b>The load, honestly.</b> Five loaded days against two recovery days, and Thursday stacks two hours of S&amp;C with team training. That is a full week for anyone, let alone three weeks off the back of a groin injury. It works only if Friday and Sunday stay genuinely easy and Whoop gets a veto. If recovery reads red, the top-up bike work is the first thing to drop, not sleep or food.</div>
-
-  <div class="callout c-info"><b>The bike and the treadmill &mdash; the engine.</b> His football already gives plenty of flat-out work, so the Concept2 and treadmill aren't here to pile on more intensity. They do the two jobs his sessions don't: build the aerobic base that lets him repeat sprints deep into a game, and add training minutes without pounding the groin. That's why it's mostly steady Zone 2, not extra intervals on top of an already heavy week. <b>Monday</b> carries the main engine session, <b>Friday</b> the easy flush, <b>Sunday</b> an optional easy spin, plus treadmill for warm-ups, strides and rebuilding his running minutes. The target for the block: take him from strong 30-minute cameos to lasting the full 90. Any genuinely hard interval work stays inside Lee Moore's Thursday S&amp;C, where it's managed against everything else.</div>
-
-  <div class="card day med">
-    <div class="dhead"><span class="dday">Monday</span><span class="dtag">Bike engine + Kayden (technical &amp; cognitive)</span></div>
-    <span class="pill p-med">Medium</span><span class="pill p-carb">Medium carb</span>
-    <ul class="tl">
-      <li><span class="t">08:00</span><span class="d"><b>Breakfast.</b> Standard. Protein source + carbs.</span></li>
-      <li><span class="t">10:30</span><span class="d"><b>Snack.</b> Fulfil or a yoghurt + fruit.</span></li>
-      <li><span class="t">12:30</span><span class="d"><b>Lunch.</b> Quick/portable (jacket + beans, wrap, pasta pot).</span></li>
-      <li><span class="t">15:30</span><span class="d"><b>Pre-session fuel.</b> Banana + white toast, ~90 min out.</span></li>
-      <li><span class="t">~16:00</span><span class="d"><b>Bike engine.</b> Concept2 Zone 2, 35&ndash;40 min, HR 70&ndash;80%, RPE 4&ndash;5. Steady, not flat-out. Finish with 4&ndash;6 &times; 20s easy treadmill strides if he's fresh.</span></li>
-      <li><span class="t">Eve</span><span class="d"><b>Kayden session.</b> Warm up properly first, groin included.</span></li>
-      <li><span class="t">Post</span><span class="d"><b>Dinner + dessert.</b> Good refuel after two sessions.</span></li>
-      <li><span class="t">Night</span><span class="d"><b>Recovery.</b> Normatec + foam roll, then bed. 9&ndash;10 h.</span></li>
-    </ul>
-  </div>
-
-  <div class="card day med">
-    <div class="dhead"><span class="dday">Tuesday</span><span class="dtag">Ashington team training (eve)</span></div>
-    <span class="pill p-med">Medium</span><span class="pill p-carb">Medium carb</span>
-    <ul class="tl">
-      <li><span class="t">08:00</span><span class="d"><b>Breakfast.</b></span></li>
-      <li><span class="t">10:30</span><span class="d"><b>Snack.</b></span></li>
-      <li><span class="t">13:00</span><span class="d"><b>Lunch.</b> Pasta-based if he can (bolognese/lasagne) to top up fuel for the evening.</span></li>
-      <li><span class="t">17:15</span><span class="d"><b>Pre-training snack.</b> Banana, Fulfil, small porridge.</span></li>
-      <li><span class="t">19:00</span><span class="d"><b>Team training.</b></span></li>
-      <li><span class="t">21:10</span><span class="d"><b>Bridge.</b> Protein shake or Fulfil if dinner is delayed.</span></li>
-      <li><span class="t">21:45</span><span class="d"><b>Dinner + dessert.</b> Protein + carbs to refuel.</span></li>
-      <li><span class="t">Night</span><span class="d"><b>Normatec, stretch, bed.</b></span></li>
-    </ul>
-  </div>
-
-  <div class="card day med">
-    <div class="dhead"><span class="dday">Wednesday</span><span class="dtag">Alternating &middot; Danny Fowler / Brazilian Soccer Schools</span></div>
-    <span class="pill p-med">Medium&ndash;hard</span><span class="pill p-carb">Medium carb</span>
-    <div class="callout c-good" style="margin:8px 0 10px"><b>Smart move.</b> Danny Fowler one week, Brazilian the next, rather than both. That keeps a genuinely hard technical session in without adding a sixth loaded day. Whichever it is, it's high intensity, so treat it like a real session.</div>
-    <ul class="tl">
-      <li><span class="t">08:00</span><span class="d"><b>Breakfast.</b></span></li>
-      <li><span class="t">10:30</span><span class="d"><b>Snack.</b></span></li>
-      <li><span class="t">12:30</span><span class="d"><b>Lunch.</b> Fuel before an afternoon session.</span></li>
-      <li><span class="t">~90 min pre</span><span class="d"><b>Pre-session fuel.</b></span></li>
-      <li><span class="t">PM</span><span class="d"><b>Session</b> (Danny or Brazilian).</span></li>
-      <li><span class="t">Eve</span><span class="d"><b>Dinner + dessert. Recovery.</b></span></li>
-    </ul>
-  </div>
-
-  <div class="card day hard">
-    <div class="dhead"><span class="dday">Thursday</span><span class="dtag">S&amp;C (2 h, Lee Moore) + Ashington training &middot; highest load</span></div>
-    <span class="pill p-hard">Hard &middot; double</span><span class="pill p-carb">High carb</span>
-    <ul class="tl">
-      <li><span class="t">AM</span><span class="d"><b>Higher-carb breakfast.</b> Add extra toast/porridge/banana. Today he eats for two sessions.</span></li>
-      <li><span class="t">Midday</span><span class="d"><b>Lunch with pasta/rice/potatoes.</b> Don't go in light.</span></li>
-      <li><span class="t">PM</span><span class="d"><b>S&amp;C with Lee Moore</b> (2 h). Lee manages this to complement the football load.</span></li>
-      <li><span class="t">Between</span><span class="d"><b>Refuel.</b> Carbs + protein between S&amp;C and football (shake + banana, or rice/pasta pot).</span></li>
-      <li><span class="t">Eve</span><span class="d"><b>Ashington training.</b></span></li>
-      <li><span class="t">Late</span><span class="d"><b>Large recovery dinner</b> + rice pudding or protein dessert.</span></li>
-      <li><span class="t">Night</span><span class="d"><b>Normatec + massage gun, early bed.</b> <span style="color:#ffc766">No ice bath straight after the S&amp;C</span> (see Recovery tab).</span></li>
-    </ul>
-  </div>
-
-  <div class="card day rest">
-    <div class="dhead"><span class="dday">Friday</span><span class="dtag">Recovery for the body, fuel for tomorrow</span></div>
-    <span class="pill p-rest">Recovery</span><span class="pill p-carb">Carbs up for Saturday</span>
-    <ul class="tl">
-      <li><span class="t">Optional</span><span class="d"><b>20&ndash;30 min Zone 1 bike</b> on the Concept2 to flush the legs. Easy, conversational.</span></li>
-      <li><span class="t">Day</span><span class="d"><b>Protein high, carbs steady.</b> Tomorrow's the big day, so tonight tops the tank up, doesn't empty it.</span></li>
-      <li><span class="t">PM</span><span class="d"><b>Groin prehab + mobility.</b> Copenhagen adduction, hip work.</span></li>
-      <li><span class="t">Eve</span><span class="d"><b>Fish fingers &amp; chips</b> (his Friday ritual) &mdash; genuinely fine the night before a game, it's carbs he'll use. Oven-bake, add beans or veg. Ice bath OK. Something sweet after.</span></li>
-    </ul>
-  </div>
-
-  <div class="card day med">
-    <div class="dhead"><span class="dday">Saturday</span><span class="dtag">Ashington training (becomes match in season)</span></div>
-    <span class="pill p-med">Hard</span><span class="pill p-carb">High carb</span>
-    <ul class="tl">
-      <li><span class="t">AM</span><span class="d"><b>Normal breakfast</b>, slightly higher carb.</span></li>
-      <li><span class="t">Midday</span><span class="d"><b>Balanced lunch</b>, carbs in. Fuel for the session.</span></li>
-      <li><span class="t">Session</span><span class="d"><b>Ashington.</b> In season this becomes the match, same fuelling.</span></li>
-      <li><span class="t">Post</span><span class="d"><b>Refuel quickly</b>, then the Saturday takeaway (see Meals). It's a good post-match refuel, keep it.</span></li>
-      <li><span class="t">Night</span><span class="d"><b>Ice bath / Normatec</b> after the load. Bed.</span></li>
-    </ul>
-  </div>
-
-  <div class="card day rest">
-    <div class="dhead"><span class="dday">Sunday</span><span class="dtag">Recovery &amp; prep</span></div>
-    <span class="pill p-rest">Recovery</span><span class="pill p-med">Lower carb</span>
-    <ul class="tl">
-      <li><span class="t">Day</span><span class="d"><b>Family meal. Walk, or an easy 20&ndash;30 min spin on the bike or treadmill.</b> Movement only, nothing hard.</span></li>
-      <li><span class="t">PM</span><span class="d"><b>Meal prep / batch cook</b> for the week ahead (see shopping list).</span></li>
-      <li><span class="t">Night</span><span class="d"><b>Set up sleep.</b> Best night of the week.</span></li>
-    </ul>
-    <div class="callout c-warn" style="margin:12px 0 0"><b>Season watch.</b> The futsal on a Sunday (and the England U23 assessment) would take away his only second recovery day. That's the single biggest load risk going into the season. Worth building Phase 2 around, not bolting on.</div>
-  </div>
+  <div id="weekBanner"></div>
+  <p class="lead">His week, day by day. <b>Tap any meal to see the options</b> for that feed. <span style="color:#ff5c94;font-weight:700">Coral</span> is a hard day, <span style="color:#c9bcd0;font-weight:700">grey</span> is recovery. This shows his <b>standard week</b> by default. To change it for a week that's different, use the <b>Planner</b> tab and it updates here.</p>
+  <div id="weekOut"></div>
 </section>
 
 <!-- ================= PLANNER ================= -->
 <section class="view" id="myday">
-  <p class="lead">His week moves around, so build the one he's <b>actually</b> got. Put in only the sessions the clubs and coaches set. Everything else, his <b>bike work, fuel and recovery</b>, is worked out from those, because those aren't things he picks, they follow the week. Carbs go up the night before a game wherever it falls, the ice bath rule follows the S&amp;C to whatever day it's on, the bike engine drops onto the light days and off the hard ones, and it warns you if the week stacks too many hard days together.</p>
+  <p class="lead">This is the control for his week. It stays on his <b>standard week</b> until you change it. Switch to <b>Customise</b> to set what he's actually doing, hit build, and the <b>This Week</b> tab updates to match. Bike, fuel and recovery are worked out from the sessions, so you only set the sessions.</p>
 
   <div class="card">
-    <h3>Set his sessions</h3>
-    <p class="muted" style="margin:4px 0 10px">Tap to add or remove. Only the fixed sessions go here: Ashington, technical one-to-ones, futsal, S&amp;C, matches. Leave a day empty for no fixed session. More than one on a day is fine (a double, or a match plus a session). It opens on his usual shape &mdash; change whatever's different this week.</p>
-    <div id="weekGrid"></div>
-    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="buildBtn">Build the week &rarr;</button>
-      <button class="btn ghost" id="clearBtn">Clear all</button>
+    <div class="segs" id="modeSegs">
+      <button class="seg on" data-mode="standard" type="button">Standard week</button>
+      <button class="seg" data-mode="custom" type="button">Customise</button>
+    </div>
+    <p class="muted" id="stdMsg" style="margin:12px 0 0">Following his standard week. The This Week tab is set to it. Tap <b>Customise</b> to change what he's doing this week.</p>
+    <div id="customPanel" style="display:none;margin-top:12px">
+      <p class="muted" style="margin:0 0 10px">Tap to add or remove sessions. Only the fixed sessions go here: Ashington, technical one-to-ones, futsal, S&amp;C, matches. Leave a day empty for rest. More than one on a day is fine.</p>
+      <div id="weekGrid"></div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="buildBtn">Build the week &rarr;</button>
+        <button class="btn ghost" id="clearBtn">Reset to standard</button>
+      </div>
     </div>
   </div>
-
-  <div id="weekOut"></div>
 </section>
 
 <!-- ================= MEALS ================= -->
@@ -572,6 +491,7 @@ render('m-dinner',MEALS.dinner);
 render('m-dessert',MEALS.dessert);
 
 /* ---- Weekly planner ---- */
+var MODE='standard';
 var PDAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var SESS=[
   {id:'team',label:'Ashington',load:2,cut:true},
@@ -592,7 +512,7 @@ PDAYS.forEach(function(d){WEEK[d]=(PDEFAULT[d]||[]).slice()});
     var chips=document.createElement('div'); chips.className='pchips';
     SESS.forEach(function(s){
       var c=document.createElement('button'); c.className='pchip'; c.type='button';
-      c.innerHTML=s.label;
+      c.innerHTML=s.label; c.setAttribute('data-d',d); c.setAttribute('data-s',s.id);
       if(WEEK[d].indexOf(s.id)>-1){ c.classList.add('on'); if(s.sc||s.match) c.classList.add('hard'); }
       c.addEventListener('click',function(){
         var arr=WEEK[d]; var i=arr.indexOf(s.id);
@@ -603,11 +523,29 @@ PDAYS.forEach(function(d){WEEK[d]=(PDEFAULT[d]||[]).slice()});
     });
     row.appendChild(nm); row.appendChild(chips); grid.appendChild(row);
   });
-  document.getElementById('buildBtn').addEventListener('click',buildWeek);
+  function syncChips(){
+    grid.querySelectorAll('.pchip').forEach(function(c){
+      var d=c.getAttribute('data-d'), s=c.getAttribute('data-s');
+      var on=WEEK[d].indexOf(s)>-1;
+      c.classList.toggle('on',on);
+      c.classList.toggle('hard', on && (s==='sc'||s==='match'));
+    });
+  }
+  function gotoWeek(){ var t=document.querySelector('.tab[data-v="week"]'); if(t) t.click(); }
+  document.getElementById('buildBtn').addEventListener('click',function(){ MODE='custom'; buildWeek(); gotoWeek(); });
   document.getElementById('clearBtn').addEventListener('click',function(){
-    PDAYS.forEach(function(d){WEEK[d]=[]});
-    grid.querySelectorAll('.pchip').forEach(function(c){c.classList.remove('on','hard')});
-    buildWeek();
+    PDAYS.forEach(function(d){WEEK[d]=(PDEFAULT[d]||[]).slice()});
+    syncChips();
+  });
+  document.querySelectorAll('#modeSegs .seg').forEach(function(sg){
+    sg.addEventListener('click',function(){
+      document.querySelectorAll('#modeSegs .seg').forEach(function(x){x.classList.remove('on')});
+      sg.classList.add('on');
+      var mode=sg.getAttribute('data-mode');
+      var panel=document.getElementById('customPanel'), msg=document.getElementById('stdMsg');
+      if(mode==='custom'){ panel.style.display='block'; msg.style.display='none'; syncChips(); }
+      else { panel.style.display='none'; msg.style.display='block'; MODE='standard'; PDAYS.forEach(function(d){WEEK[d]=(PDEFAULT[d]||[]).slice()}); syncChips(); buildWeek(); }
+    });
   });
   buildWeek();
 })();
@@ -716,9 +654,36 @@ function buildWeek(){
     return 'Medium carb';
   }
 
+  function feedsFor(day,m){
+    var fe=[];
+    fe.push({label:'Breakfast', time:(m.big?'higher carb':''), cat:'breakfast'});
+    fe.push({label:'Mid-morning snack', cat:'snack'});
+    fe.push({label:'Lunch', time:(m.big?'carbs in':''), cat:'lunch'});
+    if(!m.empty){
+      fe.push({label:'Pre-session fuel', time:'~90 min before', cat:'snack', note:'Something light with carbs: banana + white toast, or a Fulfil.'});
+      if(m.isDouble) fe.push({label:'Between sessions', note:'Carbs + protein between the two: a shake + banana, or a rice/pasta pot.'});
+    }
+    var dn='';
+    if(day==='Fri') dn='His Friday fish fingers &amp; chips fits here, fine before a game. Oven-bake, add beans or veg.';
+    if(m.match) dn='After a match, the clean McDonald\'s takeaway is a solid refuel (see the Meals tab).';
+    fe.push({label:(m.empty?'Dinner':'Dinner &amp; refuel'), cat:'dinner', note:dn});
+    fe.push({label:'Dessert', cat:'dessert', note:'Something sweet after, he needs it. Maltesers, or a protein or rice pudding.'});
+    return fe;
+  }
+  function feedHtml(fe){
+    return fe.map(function(fd){
+      var opts = fd.cat && MEALS[fd.cat] ? MEALS[fd.cat].map(function(mm){return '<div style="margin:4px 0"><b>'+mm.n+'</b> <span class="muted">'+mm.b+'</span></div>'}).join('') : '';
+      var body=(fd.note?'<div class="muted" style="margin-bottom:'+(opts?'8px':'0')+'">'+fd.note+'</div>':'')+opts;
+      return '<div class="feed"><div class="fhead"><span><b>'+fd.label+'</b>'+(fd.time?'<span class="ftime">'+fd.time+'</span>':'')+'</span><span class="caret">&#9656;</span></div><div class="fbody">'+body+'</div></div>';
+    }).join('');
+  }
+
   var html='';
+  html+= (MODE==='custom')
+    ? '<div class="callout c-info" style="margin-top:0"><b>Your customised week</b>, built from the Planner. Tap Standard week in the Planner to go back to his usual.</div>'
+    : '<div class="callout c-good" style="margin-top:0"><b>Standard week</b> &mdash; his usual shape. To change it for a week that\'s different, open the Planner tab and tap Customise.</div>';
   var sumCls = warns.length? 'c-warn':'c-good';
-  html+='<div class="callout '+sumCls+'"><b>The week you\'ve built.</b> '+hardDays+' hard day'+(hardDays===1?'':'s')+', '+restDays+' recovery day'+(restDays===1?'':'s')+', '+engineCount+' bike engine session'+(engineCount===1?'':'s')+'.';
+  html+='<div class="callout '+sumCls+'"><b>The week at a glance.</b> '+hardDays+' hard day'+(hardDays===1?'':'s')+', '+restDays+' recovery day'+(restDays===1?'':'s')+', '+engineCount+' bike engine session'+(engineCount===1?'':'s')+'.';
   if(warns.length){ html+='<ul class="clean" style="margin:6px 0 0">'+li(warns)+'</ul>'; } else { html+=' Nicely balanced.'; }
   html+='</div>';
 
@@ -730,12 +695,14 @@ function buildWeek(){
     if(f.afterBig) html+=' <span class="pill p-rest" style="vertical-align:middle">Recovery emphasis after yesterday</span>';
     html+='<p class="muted" style="margin:8px 0 4px"><b>Bike / treadmill.</b> '+bikeText(cc)+'</p>';
     html+='<p class="muted" style="margin:0 0 6px"><b>Fuel.</b> '+fuelNote(m,f,cc)+'</p>';
-    html+='<p class="muted" style="margin:0 0 4px"><b>Recovery.</b></p><ul class="clean muted" style="margin:0">'+li(recList(m))+'</ul>';
+    html+= feedHtml(feedsFor(PDAYS[k],m));
+    html+='<p class="muted" style="margin:10px 0 4px"><b>Recovery.</b></p><ul class="clean muted" style="margin:0">'+li(recList(m))+'</ul>';
     html+='<p style="margin:8px 0 0"><span class="pill '+ib.c+'">Ice bath</span> <span class="muted">'+ib.t+'</span></p>';
     html+='</div>';
   }
   html+='<div class="callout c-info"><b>Every day, whatever the week looks like:</b> a real protein source at each meal, water through the day, 9&ndash;10 hours\' sleep, and a full warm-up before every session. If Whoop is red in the morning, ease that day and protect sleep.</div>';
   out.innerHTML=html;
+  out.querySelectorAll('.feed').forEach(function(fe){ fe.querySelector('.fhead').addEventListener('click',function(){ fe.classList.toggle('open'); }); });
 }
 </script>
 </body>
