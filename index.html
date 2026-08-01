@@ -112,6 +112,28 @@
   .trackrow label{flex:1 1 auto;font-weight:600}
   .trackrow input{flex:0 0 130px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:14px}
   .foot{color:var(--mut);font-size:13px;text-align:center;margin-top:30px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chk{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 13px;cursor:pointer;user-select:none}
+  .chk:hover{border-color:var(--accent)}
+  .chk input{accent-color:var(--accent);width:17px;height:17px;flex:0 0 auto}
+  .chk.sel{border-color:var(--accent);background:rgba(0,255,133,.08)}
+  .segs{display:inline-flex;gap:4px;margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:4px}
+  .seg{border:none;background:transparent;color:var(--mut);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700}
+  .seg.on{background:var(--accent);color:#08210f}
+  .btn{background:var(--accent);color:#08210f;border:none;border-radius:10px;padding:12px 20px;font-weight:800;font-size:15px;cursor:pointer;margin-top:4px}
+  .btn:hover{filter:brightness(1.08)}
+  .out-tag{display:inline-block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:5px 11px;border-radius:8px;margin-bottom:4px}
+  .flabel{font-size:13px;color:var(--mut);font-weight:600;display:block;margin-top:6px}
+  .pday{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+  .pday:first-child{border-top:none}
+  .pdname{flex:0 0 40px;font-weight:800;font-size:14px;padding-top:6px}
+  .pchips{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+  .pchip{border:1px solid var(--line);background:var(--panel2);color:var(--mut);border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:600;cursor:pointer}
+  .pchip:hover{border-color:var(--accent)}
+  .pchip.on{background:var(--accent);color:#08210f;border-color:var(--accent)}
+  .pchip.on.hard{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+  .btn.ghost{background:transparent;color:var(--mut);border:1px solid var(--line)}
+  .btn.ghost:hover{color:var(--ink);border-color:var(--mut)}
   .print{display:none}
   @media print{
     nav.tabs,.foot{display:none}
@@ -141,6 +163,7 @@
 
 <nav class="tabs" id="tabs">
   <button class="tab active" data-v="week">This Week</button>
+  <button class="tab" data-v="myday">Planner</button>
   <button class="tab" data-v="meals">Meals</button>
   <button class="tab" data-v="recovery">Recovery</button>
   <button class="tab" data-v="mobility">Stretch</button>
@@ -152,7 +175,7 @@
 
 <!-- ================= WEEK ================= -->
 <section class="view active" id="week">
-  <p class="lead">The preseason week, built around what's fixed with Ashington and his one-to-ones. Two colours matter: <span style="color:#ff8f8f;font-weight:700">red</span> is a genuine hard day, <span style="color:#b7c2cf;font-weight:700">grey</span> is real recovery. Protect the grey. Thursday is the spike, so it gets the biggest fuel and the most recovery.</p>
+  <p class="lead">The preseason week, built around what's fixed with Ashington and his one-to-ones. Two colours matter: <span style="color:#ff8f8f;font-weight:700">red</span> is a genuine hard day, <span style="color:#b7c2cf;font-weight:700">grey</span> is real recovery. Protect the grey. Thursday is the spike, so it gets the biggest fuel and the most recovery. When the week changes, and it will, build the real one in the <b>Planner</b> tab and it re-does the fuel and recovery to match.</p>
 
   <div class="callout c-warn"><b>The load, honestly.</b> Five loaded days against two recovery days, and Thursday stacks two hours of S&amp;C with team training. That is a full week for anyone, let alone three weeks off the back of a groin injury. It works only if Friday and Sunday stay genuinely easy and Whoop gets a veto. If recovery reads red, the top-up bike work is the first thing to drop, not sleep or food.</div>
 
@@ -249,6 +272,23 @@
     </ul>
     <div class="callout c-warn" style="margin:12px 0 0"><b>Season watch.</b> The futsal on a Sunday (and the England U23 assessment) would take away his only second recovery day. That's the single biggest load risk going into the season. Worth building Phase 2 around, not bolting on.</div>
   </div>
+</section>
+
+<!-- ================= PLANNER ================= -->
+<section class="view" id="myday">
+  <p class="lead">His week moves around, so build the one he's <b>actually</b> got. Tap the sessions onto each day and hit build. It works out the fuel and recovery for every day and balances the whole week: carbs go up the night before a game wherever it falls, the ice bath rule follows the S&amp;C to whatever day it's on, and it warns you if the week stacks too many hard days together.</p>
+
+  <div class="card">
+    <h3>Set his week</h3>
+    <p class="muted" style="margin:4px 0 10px">Tap a session to add or remove it. Leave a day empty for a rest day. More than one on a day is fine (a double, or a match plus a session). It opens on his usual shape &mdash; change whatever's different this week.</p>
+    <div id="weekGrid"></div>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="buildBtn">Build the week &rarr;</button>
+      <button class="btn ghost" id="clearBtn">Clear all</button>
+    </div>
+  </div>
+
+  <div id="weekOut"></div>
 </section>
 
 <!-- ================= MEALS ================= -->
@@ -472,7 +512,8 @@ var MEALS={
     {n:"Porridge, milk, banana &amp; sugar",tags:["quick","carb"],b:"Oats with milk, sliced banana, 1 tbsp sugar (how he actually has it). Stir in a scoop of protein powder to make it a proper protein breakfast. <b>Higher-carb version for Thursday/Saturday:</b> bigger bowl + extra banana or an extra round of white toast."},
     {n:"Bacon sandwich on white bread + banana",tags:["quick","carb"],b:"He loves a bacon sandwich, so use it. White bread (his preference, and fine for fuel), bacon medallions or grilled bacon to keep it a bit leaner, banana on the side. Good protein and carbs, ideal on a training day."},
     {n:"Eggy bread + banana",tags:["quick","carb"],b:"White bread soaked in egg and fried &mdash; the one egg form he'll eat. Banana or apple alongside. Add bacon to push the protein up."},
-    {n:"Beans on white toast + banana",tags:["quick"],b:"Quick and warm, with some protein from the beans. Grate cheese on for more. Handy when he wants something fast."}
+    {n:"Beans on white toast + banana",tags:["quick"],b:"Quick and warm, with some protein from the beans. Grate cheese on for more. Handy when he wants something fast."},
+    {n:"Chicken sausages + white toast &amp; beans",tags:["quick","carb"],b:"Grilled chicken sausages (he likes these) with white toast and beans. Lean-ish protein and carbs, a good start before a training day."}
   ],
   snack:[
     {n:"Munch Bunch yoghurt",tags:["quick","port"],b:"A kids' yoghurt he likes. Light (~80 kcal, ~4 g protein), so it's a sweet snack, not a protein hit. Fine to have, just don't rely on it for protein."},
@@ -497,7 +538,9 @@ var MEALS={
     {n:"Lasagne",tags:["carb"],b:"Batch and freeze in portions. Carbs, protein, easy reheat."},
     {n:"Homemade lighter parmo",tags:[],b:"The Teesside favourite, done leaner: baked not fried chicken, lighter sauce and cheese. Keeps a treat meal in without the grease."},
     {n:"Roast dinner",tags:["carb"],b:"Sunday classic. Lean meat, potatoes, loads of veg. Good family-meal recovery day option."},
-    {n:"Chicken fajitas",tags:["carb"],b:"Chicken, peppers, wraps or rice. Quick, colourful, easy to scale portions."}
+    {n:"Chicken fajitas",tags:["carb"],b:"Chicken, peppers, wraps or rice. Quick, colourful, easy to scale portions."},
+    {n:"Sweet potato fries (with any protein)",tags:["carb"],b:"He loves these, so use them. Oven-baked sweet potato fries alongside chicken, fillet steak, cod or a lean burger. A cracking carb side, great on a training or match day, and a nice swap for potatoes when he fancies a change."},
+    {n:"Chicken sausages, mash + veg",tags:["carb"],b:"Bangers and mash done with chicken sausages and plenty of veg. Comfort food that still does a job. Also good chopped through pasta with a tomato sauce."}
   ],
   dessert:[
     {n:"Maltesers (his favourite)",tags:[],b:"He needs something sweet after his main meal, so build it in rather than fight it. A proper portion, every evening if he wants. Planned means it's not a problem."},
@@ -527,6 +570,145 @@ render('m-snack',MEALS.snack);
 render('m-lunch',MEALS.lunch);
 render('m-dinner',MEALS.dinner);
 render('m-dessert',MEALS.dessert);
+
+/* ---- Weekly planner ---- */
+var PDAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+var SESS=[
+  {id:'bike',label:'Bike engine',load:1},
+  {id:'spin',label:'Easy spin',load:0},
+  {id:'team',label:'Ashington',load:2,cut:true},
+  {id:'tech',label:'Technical',load:2,cut:true},
+  {id:'futsal',label:'Futsal',load:2,cut:true},
+  {id:'sc',label:'S&amp;C',load:2,sc:true},
+  {id:'match',label:'Match',load:3,cut:true,match:true}
+];
+var PDEFAULT={Mon:['bike'],Tue:['team'],Wed:['tech'],Thu:['sc','team'],Fri:[],Sat:['match'],Sun:[]};
+var WEEK={};
+PDAYS.forEach(function(d){WEEK[d]=(PDEFAULT[d]||[]).slice()});
+(function(){
+  var grid=document.getElementById('weekGrid');
+  if(!grid) return;
+  PDAYS.forEach(function(d){
+    var row=document.createElement('div'); row.className='pday';
+    var nm=document.createElement('div'); nm.className='pdname'; nm.textContent=d;
+    var chips=document.createElement('div'); chips.className='pchips';
+    SESS.forEach(function(s){
+      var c=document.createElement('button'); c.className='pchip'; c.type='button';
+      c.innerHTML=s.label;
+      if(WEEK[d].indexOf(s.id)>-1){ c.classList.add('on'); if(s.sc||s.match) c.classList.add('hard'); }
+      c.addEventListener('click',function(){
+        var arr=WEEK[d]; var i=arr.indexOf(s.id);
+        if(i>-1){arr.splice(i,1);c.classList.remove('on','hard');}
+        else{arr.push(s.id);c.classList.add('on'); if(s.sc||s.match) c.classList.add('hard');}
+      });
+      chips.appendChild(c);
+    });
+    row.appendChild(nm); row.appendChild(chips); grid.appendChild(row);
+  });
+  document.getElementById('buildBtn').addEventListener('click',buildWeek);
+  document.getElementById('clearBtn').addEventListener('click',function(){
+    PDAYS.forEach(function(d){WEEK[d]=[]});
+    grid.querySelectorAll('.pchip').forEach(function(c){c.classList.remove('on','hard')});
+    buildWeek();
+  });
+  buildWeek();
+})();
+
+function dayMeta(ids){
+  var sel=SESS.filter(function(s){return ids.indexOf(s.id)>-1});
+  var real=sel.filter(function(s){return s.load>0});
+  var totalLoad=real.reduce(function(a,s){return a+s.load},0);
+  var hardCount=real.filter(function(s){return s.load>=2}).length;
+  return {
+    sel:sel, real:real, totalLoad:totalLoad, hardCount:hardCount,
+    cut:real.some(function(s){return s.cut}),
+    sc:real.some(function(s){return s.sc}),
+    match:real.some(function(s){return s.match}),
+    isDouble:hardCount>=2 || (real.some(function(s){return s.sc}) && real.length>=2),
+    big:(real.some(function(s){return s.match})) || totalLoad>=4
+  };
+}
+
+function buildWeek(){
+  var out=document.getElementById('weekOut');
+  var metas=PDAYS.map(function(d){return dayMeta(WEEK[d])});
+  var hardDays=metas.filter(function(m){return m.totalLoad>=2}).length;
+  var restDays=metas.filter(function(m){return m.totalLoad===0}).length;
+
+  var warns=[];
+  var run=0, runMax=0, runStart=-1, worstStart=-1;
+  for(var i=0;i<7;i++){
+    if(metas[i].totalLoad>=2){ if(run===0)runStart=i; run++; if(run>runMax){runMax=run;worstStart=runStart;} }
+    else run=0;
+  }
+  if(runMax>=3){ warns.push(runMax+' hard days in a row ('+PDAYS[worstStart]+'&ndash;'+PDAYS[worstStart+runMax-1]+'). Try to drop one to a lighter day or a rest.'); }
+  if(restDays===0) warns.push('No proper recovery day this week. Aim for at least one genuinely easy day, ideally two.');
+  else if(restDays===1) warns.push('Only one real recovery day. Two is better when the load allows.');
+
+  var flags=PDAYS.map(function(){return {};});
+  for(var j=0;j<7;j++){
+    var nx=metas[j+1];
+    if(nx && (nx.match||nx.big) && !metas[j].big && metas[j].totalLoad<4){ flags[j].carbUp=true; }
+    var pv=metas[j-1];
+    if(pv && pv.big && metas[j].totalLoad>=2){ flags[j].afterBig=true; }
+  }
+
+  function li(a){return a.map(function(x){return '<li>'+x+'</li>'}).join('')}
+  function fuelNote(m,f){
+    if(m.totalLoad===0) return 'Normal meals, carbs a touch lower, a real protein source at each. One dessert in the evening.';
+    var t='Protein at every meal, carbs matched to the day. Fuel ~90 min before the session, refuel with carbs + protein after.';
+    if(m.isDouble) t+=' Two sessions, so refuel between them as well.';
+    if(f.carbUp) t+=' <b>Keep carbs up tonight for tomorrow</b> (his fish fingers and chips night before a game).';
+    return t;
+  }
+  function recList(m){
+    if(m.totalLoad===0) return ['Normatec legs 20 min flush + hip/abdomen wrap on the groin','Daily mobility + Copenhagen adduction','Foam roll, unhurried'];
+    var r=['Normatec legs 20&ndash;30 min + massage gun on the legs'];
+    if(m.cut) r.push('Normatec hips 15 min + hip/abdomen wrap on the groin');
+    if(m.sc||m.match||m.big) r.push('Knee units 15 min each side');
+    r.push('Hyperboot warm before, cool after');
+    return r;
+  }
+  function iceBath(m){
+    if(m.sc) return {t:'No, it would cancel the S&amp;C',c:'p-hard'};
+    if(m.match||m.hardCount>=2) return {t:'Yes, 10&ndash;12 min within ~2 h',c:'p-quick'};
+    if(m.totalLoad>=2) return {t:'Only if genuinely sore',c:'p-rest'};
+    return {t:'Not needed',c:'p-rest'};
+  }
+  function typeOf(m){
+    if(m.totalLoad===0) return {t:'Recovery',c:'p-rest'};
+    if(m.big) return {t:'Big day',c:'p-hard'};
+    if(m.totalLoad>=2) return {t:'Training',c:'p-med'};
+    return {t:'Light',c:'p-med'};
+  }
+  function carbOf(m,f){
+    if(m.totalLoad===0) return 'Lower carb';
+    if(m.big) return 'High carb';
+    if(f.carbUp) return 'Carbs up for tomorrow';
+    if(m.totalLoad>=2) return 'Medium carb';
+    return 'Steady carb';
+  }
+
+  var html='';
+  var sumCls = warns.length? 'c-warn':'c-good';
+  html+='<div class="callout '+sumCls+'"><b>The week you\'ve built.</b> '+hardDays+' hard day'+(hardDays===1?'':'s')+', '+restDays+' recovery day'+(restDays===1?'':'s')+'.';
+  if(warns.length){ html+='<ul class="clean" style="margin:6px 0 0">'+li(warns)+'</ul>'; } else { html+=' Nicely balanced.'; }
+  html+='</div>';
+
+  for(var k=0;k<7;k++){
+    var m=metas[k], f=flags[k], ty=typeOf(m), ib=iceBath(m);
+    var names=m.real.length? m.real.map(function(s){return s.label}).join(', ') : 'Rest day';
+    html+='<div class="card"><div class="dhead"><span class="dday">'+PDAYS[k]+'</span><span class="dtag">'+names+'</span></div>';
+    html+='<span class="out-tag '+ty.c+'">'+ty.t+'</span> <span class="pill p-carb" style="vertical-align:middle">'+carbOf(m,f)+'</span>';
+    if(f.afterBig) html+=' <span class="pill p-rest" style="vertical-align:middle">Recovery emphasis after yesterday</span>';
+    html+='<p class="muted" style="margin:8px 0 6px"><b>Fuel.</b> '+fuelNote(m,f)+'</p>';
+    html+='<p class="muted" style="margin:0 0 4px"><b>Recovery.</b></p><ul class="clean muted" style="margin:0">'+li(recList(m))+'</ul>';
+    html+='<p style="margin:8px 0 0"><span class="pill '+ib.c+'">Ice bath</span> <span class="muted">'+ib.t+'</span></p>';
+    html+='</div>';
+  }
+  html+='<div class="callout c-info"><b>Every day, whatever the week looks like:</b> a real protein source at each meal, water through the day, 9&ndash;10 hours\' sleep, and a full warm-up before every session. If Whoop is red in the morning, ease that day and protect sleep.</div>';
+  out.innerHTML=html;
+}
 </script>
 </body>
 </html>
